@@ -7,17 +7,30 @@ import { normalize, join, resolve } from 'path';
 async function getLayerInformation() {
   // Background and hillshading aren't defined via tilemaker outputs, so set their
   // z-indexes here.
-  const layerIndex = {
-    'background': -1,
-    'hillshading': 50,
-  };
+  const layerIndex = {};
   const layersInFile = {};
+
+  {
+    const dataString = await (Bun.file('styles/style.json').text());
+    const data = json6.parse(dataString);
+
+    for (const layer of data.layers || []) {
+      const { id } = layer;
+      const m = /-([0-9]+)$/.exec(id);
+
+      if (m) {
+        //seenLayers[id] = true;
+        layerIndex[id] = Number(m[1]);
+      }
+    }
+  }
+
 
   const glob = new Glob("/layers/*.json");
   for (const file of glob.scanSync(".")) {
     const root = file.replace(/.*[/]/, '').replace('.json', '');
     const dataString = await (Bun.file(file).text());
-    const data = JSON.parse(dataString);
+    const data = json6.parse(dataString);
 
     const seenLayers = {};
 
@@ -86,8 +99,8 @@ async function mergeStyles() {
     const aLayer = a['source-layer'] || a['id'] || '';
     const bLayer = b['source-layer'] || b['id'] || '';
 
-    const az = layerIndex[aLayer] || 99999;
-    const bz = layerIndex[bLayer] || 99999;
+    const az = layerIndex[aLayer] ?? 99999;
+    const bz = layerIndex[bLayer] ?? 99999;
 
     if (az != bz)
       return az - bz;
