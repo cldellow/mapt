@@ -126,8 +126,6 @@ async function handleStyleJson() {
 
 export function normalizePath(rootDir, rawPathname) {
   let path = `${rawPathname}`;
-  if (path.endsWith('/'))
-    path += 'index.html';
   if (path === '/map')
     path = '/map.html';
 
@@ -145,6 +143,42 @@ export function normalizePath(rootDir, rawPathname) {
   return path;
 }
 
+export async function handleIndex() {
+  const tiles = [];
+
+  const glob = new Glob("/*.pmtiles");
+  const files = [];
+  for (const file of glob.scanSync("."))
+    files.push(file);
+
+  files.sort();
+  for (const file of files) {
+    const url = `http://localhost:8081/${file}`;
+    const pmUrl = `https://protomaps.github.io/PMTiles/?url=${encodeURIComponent(url)}`;
+    console.log(file);
+    tiles.push(
+      `<li><a href="${pmUrl}">${file}</a></li>`
+    );
+  }
+
+  const response = new Response(`
+<head>
+  <title>Mapt</title>
+</head>
+<body>
+<a href='/map'>See your map, with styling</a>
+<hr/>
+<ul>
+${tiles.join('')}
+</ul>
+</body>
+`);
+
+  response.headers.set('Content-type', 'text/html');
+
+  return response;
+}
+
 export function serve(args: {
   rootDir: string,
   port: number
@@ -156,6 +190,9 @@ export function serve(args: {
     async fetch(req) {
       const url = new URL(req.url);
       console.log(`${new Date().toISOString()}: ${url.pathname}`);
+
+      if (url.pathname === '/')
+        return handleIndex();
 
       const path = normalizePath(rootDir, url.pathname);
 
