@@ -1,0 +1,130 @@
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mapt Map</title>
+  <script src="https://unpkg.com/pmtiles@2.5.0/dist/index.js"></script>
+  <script src='https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.js'></script>
+
+  <link href='https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.css' rel='stylesheet' />
+  <style>
+.map {
+  border: 1px solid red;
+  width: 75%;
+  height: 100%;
+  display: inline-block;
+}
+
+#features {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 25%;
+  overflow: auto;
+  background: rgba(255, 255, 255, 0.8);
+}
+  </style>
+</head>
+<body>
+<script>
+const maps = [
+  [15, -64.8765, 45.3678], // Cape Chignecto PP, NS
+];
+
+class LocationReporterControl {
+  onAdd(map) {
+    this._map = map;
+    this._container = document.createElement('div');
+    this._container.className = 'maplibregl-ctrl';
+
+    const reportLocation = () => {
+      const center = map.getCenter();
+      this._container.textContent = `z${map.getZoom().toFixed(2)} ${center.lng.toFixed(6)}, ${center.lat.toFixed(6)}`;
+    }
+    map.on('zoomend', reportLocation);
+    map.on('moveend', reportLocation);
+    reportLocation();
+
+    return this._container;
+  }
+
+  onRemove() {
+    this._container.parentNode.removeChild(this._container);
+    this._map = undefined;
+  }
+}
+
+let protocol = new pmtiles.Protocol();
+maplibregl.addProtocol("pmtiles",protocol.tile);
+
+for (const [zoom, lng, lat] of maps) {
+  const div = document.createElement('div');
+  div.classList.add('map');
+  div.id = 'map' + zoom;
+  document.body.appendChild(div);
+
+  const map = new maplibregl.Map({
+    container: 'map' + zoom,
+    center: [lng, lat], // starting position [lng, lat]
+    zoom,
+    hash: true,
+    maxZoom: 20,
+    minZoom: 0,
+    style: '/style.json',
+  });
+  map.showTileBoundaries = true ;
+  map.addControl(new LocationReporterControl());
+
+  let scale = new maplibregl.ScaleControl({
+      maxWidth: 80,
+      unit: 'metric' // or imperial
+  });
+  map.addControl(scale);
+
+  map.on('mousemove', (e) => {
+    const features = map.queryRenderedFeatures(e.point);
+
+    const displayProperties = [
+      'type',
+      'properties',
+      'id',
+      'layer',
+      'source',
+      'sourceLayer',
+      'state'
+    ];
+
+    const displayFeatures = features.map((feat) => {
+      const displayFeat = {};
+      displayProperties.forEach((prop) => {
+        displayFeat[prop] = feat[prop];
+      });
+      return displayFeat;
+    });
+
+    document.getElementById('features').innerHTML = JSON.stringify(
+      displayFeatures,
+      null,
+      2
+    );
+  });
+}
+
+let lastStyle = '';
+async function checkStyles() {
+  const rv = await fetch('/style.json');
+  if (rv.status === 200) {
+    const data = await rv.text();
+
+    if (lastStyle && lastStyle !== data) {
+      location.reload();
+      return;
+    } else
+      lastStyle = data;
+  }
+  window.setTimeout(checkStyles, 500);
+}
+
+window.setTimeout(checkStyles, 0);
+</script>
+<pre id="features"></pre>
+</body>
