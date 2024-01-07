@@ -65,3 +65,22 @@ Launches a local web server to preview your tiles:
   - Shows your tile files and links to [the PMTiles Viewer](https://protomaps.github.io/PMTiles/)
 - http://localhost:8081/map
   - Stitches your style files together and renders a map of your tiles.
+
+## `style`
+
+```
+mapt style
+```
+
+Stitch your stylesheets into a single stylesheet, suitable for static hosting.
+
+The algorithm for stitching styles is:
+
+- start with `styles/style.json` as the [root stylesheet](https://maplibre.org/maplibre-style-spec/root/)
+- for each other file in `styles/*.json`
+  - merge its `sources` key, renaming sources to avoid conflicts with other style files
+  - merge its `layers` key, prefixing `id` to avoid conflicts, and updating `source-layer` as needed
+- sort the resulting `layers` entries by `layer-z-index`, then by their original order in the source style file
+  - `layer-z-index` is the layer-specific `zindex` value defined in `slices/*.json` files
+
+This approach constrains the expressiveness of your style files: style rules for a given layer cannot be interwoven with style rules for other layers. This is generally what you want, and failing to follow this rule can result in difficult to debug situations.
