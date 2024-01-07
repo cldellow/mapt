@@ -15,6 +15,14 @@
   - 🎶 in dev mode, `mapt` dynamically renders your full map based on several input `pmtiles` and style files
   - 🎵 in production mode, `mapt` produces a single `pmtiles` and style file, suitable for publishing to static hosting
 
+# Install
+
+`mapt` requires Bun, whose [install instructions](https://bun.sh/docs/installation) are straight-forward.
+
+`bun install --global mapt`
+
+> TODO: verify this works. The package is not yet published to npmjs, and file-local packages can't be installed globally.
+
 # Usage
 
 `mapt` requires a specific file layout. Consider an example map
