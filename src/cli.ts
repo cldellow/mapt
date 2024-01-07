@@ -18,12 +18,12 @@ function entrypoint() {
     args = args.slice(1);
 
     const pbfs = args.filter(x => x.endsWith('.pbf'));
-    const layers = args.filter(x => !x.endsWith('.pbf'));
+    const slices = args.filter(x => !x.endsWith('.pbf'));
 
     return build({
       rootDir,
       pbfs,
-      layers,
+      slices,
     });
   } else {
     console.log(`Usage:

@@ -5,12 +5,12 @@
 
 `mapt` provides an easier developer workflow:
 
-- encourages thematic layers (e.g. `land`, `roads`, `boundaries`)
+- encourages thematic slices (e.g. `land`, `roads`, `boundaries`)
   - ⚡ iterate faster when developing
   - 🎯 create focused Lua files that are easier to understand
-- uses [JSON6](https://github.com/d3x0r/json6) for parsing `.json` files
-  - 🤝 document and collaborate with `//` and `/* ... */` comments
-  - 🔣 don't sweat the details - trailing commas and naked identifiers are OK
+- humanizes JSON config
+  - 🤝 use [JSON6](https://github.com/d3x0r/json6) for parsing `.json` files, so `//` and `/* ... */` comments, trailing commas, and naked identifiers are supported
+  - 🎨 optionally use [Tailwind CSS colour palette](https://atmos.style/palettes/tailwindcss) names like `red-50`, `red-100`, etc, not raw hex codes
 - works for dev or production
   - 🎶 in dev mode, `mapt` dynamically renders your full map based on several input `pmtiles` and style files
   - 🎵 in production mode, `mapt` produces a single `pmtiles` and style file, suitable for publishing to static hosting
@@ -18,14 +18,14 @@
 # Usage
 
 `mapt` requires a specific file layout. Consider an example map
-that has been factored into `land` and `water` themes. It has this
+that has been factored into `land` and `water` slices. It has this
 layout:
 
 ```bash
-layers/land.json    # tilemaker config file
-layers/land.lua     # tilemaker lua profile
-layers/water.json   # tilemaker config file
-layers/water.lua    # tilemaker lua profile
+slices/land.json    # tilemaker config file
+slices/land.lua     # tilemaker lua profile
+slices/water.json   # tilemaker config file
+slices/water.lua    # tilemaker lua profile
 styles/style.json   # Root MapLibre style file into which other styles
                     # will be merged
 styles/land.json    # Style file for land
@@ -38,12 +38,12 @@ intelligently combine them together as needed.
 ## `build`
 
 ```
-mapt build file.pbf layer1 layer2
+mapt build file.pbf land water
 ```
 
-Build `layer1.pmtiles` and `layer2.pmtiles` with `file.pbf` as input.
+Build `land.pmtiles` and `water.pmtiles` with `file.pbf` as input.
 
-Your tilemaker configuration will be read from `layers/layer1.json`, your Lua profile from `layers/layer1.lua`.
+Your tilemaker configuration will be read from `slices/land.json`, your Lua profile from `layers/land.lua`, etc.
 
 ## `serve`
 

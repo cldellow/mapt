@@ -5,22 +5,22 @@ import { resolve } from 'path';
 export async function build(args: {
   rootDir: string,
   pbfs: string[],
-  layers: string[]
+  slices: string[]
 }) {
-  const { pbfs, layers } = args;
+  const { pbfs, slices } = args;
   if (pbfs.length === 0)
     throw new Error(`you must pass at least one pbf`);
 
-  if (layers.length === 0) {
-    const glob = new Glob("/layers/*.json");
+  if (slices.length === 0) {
+    const glob = new Glob("/slices/*.json");
     for (const file of glob.scanSync(".")) {
-      const layer = file.replace(/.*[/]/, '').replace('.json', '');
-      layers.push(layer);
+      const slice = file.replace(/.*[/]/, '').replace('.json', '');
+      slices.push(slice);
     }
   }
 
-  for (const layer of layers) {
-    const tileFile = resolve(`${layer}.pmtiles`);
+  for (const slice of slices) {
+    const tileFile = resolve(`${slice}.pmtiles`);
 
     unlinkSync(tileFile);
 
@@ -30,11 +30,11 @@ export async function build(args: {
       '--output',
       tileFile,
       `--config`,
-      `${layer}.json`,
+      `${slice}.json`,
       `--process`,
-      `${layer}.lua`,
+      `${slice}.lua`,
     ], {
-      cwd: 'layers',
+      cwd: 'slices',
       stdout: 'inherit',
       stderr: 'inherit',
     });
