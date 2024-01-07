@@ -1,0 +1,16 @@
+{
+  "name": "mapt",
+  "version": "0.0.1",
+  "description": "An opinionated workflow for building OSM tiles and styles.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "osm",
+    "tilemaker",
+    "maps"
+  ],
+  "author": "Colin Dellow",
+  "license": "Apache-2.0"
+}
