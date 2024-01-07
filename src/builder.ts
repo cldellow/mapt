@@ -1,4 +1,6 @@
 import { Glob } from "bun";
+import { unlinkSync } from "node:fs";
+import { resolve } from 'path';
 
 export async function build(args: {
   rootDir: string,
@@ -18,11 +20,15 @@ export async function build(args: {
   }
 
   for (const layer of layers) {
+    const tileFile = resolve(`${layer}.pmtiles`);
+
+    unlinkSync(tileFile);
+
     const rv = Bun.spawnSync([
       'tilemaker',
       ...pbfs.flatMap(pbf => ['--input', pbf]),
       '--output',
-      `../${layer}.pmtiles`,
+      tileFile,
       `--config`,
       `${layer}.json`,
       `--process`,
