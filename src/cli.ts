@@ -21,6 +21,7 @@ function entrypoint() {
     const layers = args.filter(x => !x.endsWith('.pbf'));
 
     return build({
+      rootDir,
       pbfs,
       layers,
     });

@@ -1,4 +1,7 @@
+import { Glob } from "bun";
+
 export async function build(args: {
+  rootDir: string,
   pbfs: string[],
   layers: string[]
 }) {
@@ -6,7 +9,14 @@ export async function build(args: {
   if (pbfs.length === 0)
     throw new Error(`you must pass at least one pbf`);
 
-  // TODO: if layers is empty, enumerate all the layers
+  if (layers.length === 0) {
+    const glob = new Glob("/layers/*.json");
+    for (const file of glob.scanSync(".")) {
+      const layer = file.replace(/.*[/]/, '').replace('.json', '');
+      layers.push(layer);
+    }
+  }
+
   for (const layer of layers) {
     const rv = Bun.spawnSync([
       'tilemaker',
