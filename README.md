@@ -51,7 +51,7 @@ Your tilemaker configuration will be read from `slices/land.json`, your Lua prof
 mapt serve
 ```
 
-Launches a local web server to previe your tiles:
+Launches a local web server to preview your tiles:
 
 - http://localhost:8081
   - Shows your tile files and links to [the PMTiles Viewer](https://protomaps.github.io/PMTiles/)
