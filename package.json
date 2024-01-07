@@ -2,6 +2,9 @@
   "name": "mapt",
   "module": "index.ts",
   "type": "module",
+  "bin": {
+    "mapt": "./src/cli.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
