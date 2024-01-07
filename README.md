@@ -25,4 +25,9 @@ Launches a local web server to previe your tiles:
 - http://localhost:8081/map
   - Stitches your style files together and renders a map of your tiles.
 
+# Notes
 
+`mapt` is an opinionated tool for building [vector tiles](https://docs.mapbox.com/data/tilesets/guides/vector-tiles-introduction/) and, optionally,
+[MapLibre style sheets](https://maplibre.org/maplibre-style-spec/).
+
+It uses [tilemaker](https://github.com/systemed/tilemaker). You must have it available on your path.
