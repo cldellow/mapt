@@ -2,6 +2,18 @@
 
 # Usage
 
+## `build`
+
+```
+mapt build file.pbf layer1 layer2
+```
+
+Build `layer1.pmtiles` and `layer2.pmtiles` with `file.pbf` as input.
+
+Your tilemaker configuration will be read from `layers/layer1.json`, your Lua profile from `layers/layer1.lua`.
+
+## `serve`
+
 ```
 mapt serve
 ```

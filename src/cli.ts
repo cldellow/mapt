@@ -1,10 +1,11 @@
 #!/usr/bin/env bun
 
+import { build } from './builder';
 import { serve } from './server';
 import path from 'path';
 
 const rootDir = path.normalize(path.join(path.dirname(Bun.argv[1]), '..'));
-const args = Bun.argv.slice(2);
+let args = Bun.argv.slice(2);
 
 function entrypoint() {
   if (args[0] === 'serve') {
@@ -12,6 +13,16 @@ function entrypoint() {
     return serve({
       rootDir,
       port
+    });
+  } else if (args[0] === 'build') {
+    args = args.slice(1);
+
+    const pbfs = args.filter(x => x.endsWith('.pbf'));
+    const layers = args.filter(x => !x.endsWith('.pbf'));
+
+    return build({
+      pbfs,
+      layers,
     });
   } else {
     console.log(`Usage:

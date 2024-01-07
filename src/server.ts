@@ -48,6 +48,11 @@ async function mergeStyles() {
   let sourceIndex = 1;
   for (const file of glob.scanSync(".")) {
     const root = file.replace(/.*[/]/, '').replace('.json', '');
+
+    if (root === 'style')
+      // style.json is special; it's the root stylesheet and
+      // is already in `rv`
+      continue;
     const dataString = await (Bun.file(file).text());
     const data = json6.parse(dataString);
 
