@@ -55,6 +55,7 @@ class LocationReporterControl {
 
 let protocol = new pmtiles.Protocol();
 maplibregl.addProtocol("pmtiles",protocol.tile);
+const singleSuffix = new URL(window.location.href).searchParams.has('single') ? '?single' : '';
 
 for (const [zoom, lng, lat] of maps) {
   const div = document.createElement('div');
@@ -69,7 +70,7 @@ for (const [zoom, lng, lat] of maps) {
     hash: true,
     maxZoom: 20,
     minZoom: 0,
-    style: '/style.json',
+    style: `/style.json${singleSuffix}`,
   });
   map.showTileBoundaries = true ;
   map.addControl(new LocationReporterControl());
@@ -111,7 +112,7 @@ for (const [zoom, lng, lat] of maps) {
 
 let lastStyle = '';
 async function checkStyles() {
-  const rv = await fetch('/style.json');
+  const rv = await fetch(`/style.json${singleSuffix}`);
   if (rv.status === 200) {
     const data = await rv.text();
 

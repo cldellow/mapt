@@ -2,8 +2,8 @@ import { Glob } from "bun";
 import { normalize, join, resolve } from 'path';
 import { mergeStyles } from './styles';
 
-async function handleStyleJson() {
-  const data = await mergeStyles();
+async function handleStyleJson(isSingle: boolean) {
+  const data = await mergeStyles(isSingle);
   return new Response(
     JSON.stringify(data),
     {
@@ -56,7 +56,7 @@ export async function handleIndex() {
   <title>Mapt</title>
 </head>
 <body>
-<a href='/map'>See your map, with styling</a>
+See your map, with styling: <a href='/map'>development</a> or <a href='/map?single'>production</a>
 <hr/>
 <ul>
 ${tiles.join('')}
@@ -79,6 +79,7 @@ export function serve(args: {
     development: true,
     async fetch(req) {
       const url = new URL(req.url);
+      const single = url.searchParams.has('single');
       console.log(`${new Date().toISOString()}: ${url.pathname}`);
 
       if (url.pathname === '/')
@@ -88,7 +89,7 @@ export function serve(args: {
 
       // Try to load .json documents with json-6 parser so that we can have comments, etc
       if (path.endsWith('style.json'))
-        return handleStyleJson();
+        return handleStyleJson(single);
 
       let file = Bun.file(path);
 

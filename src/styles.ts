@@ -47,7 +47,7 @@ async function getLayerInformation() {
   }
 }
 
-export async function mergeStyles() {
+export async function mergeStyles(isSingle: boolean) {
   const { layerIndex, layersInFile } = await getLayerInformation();
 
   // We maintain our styles in the /styles/ folder.
@@ -66,6 +66,10 @@ export async function mergeStyles() {
       continue;
     const dataString = await (Bun.file(file).text());
     const data = json6.parse(dataString);
+
+    // TODO: we should support inserting the whole sources/tiles key if absent,
+    //       to simplify things
+    data.sources.tiles.url = `pmtiles://http://localhost:8081/${isSingle ? 'tiles' : root}.pmtiles`;
 
     const sourceMap = {};
     // TODO: de-dupe, if multiple things use the same URL
