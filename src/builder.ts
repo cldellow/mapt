@@ -212,8 +212,14 @@ ${generateInvokes('way_function();')}
 end
 
 function relation_scan_function()
-  -- TODO: give proxied modules a chance to say yes
-  return false
+  local rv;
+${modnames.map(x => {
+  return `
+  rv = ${x}.relation_scan_function() == true or rv;
+`;
+}).join('')}
+
+  return rv
 end
 
 function relation_function()
