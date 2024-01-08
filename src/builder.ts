@@ -141,11 +141,12 @@ async function buildSingle(args: {
 local _mapt_module = {};
 _mapt_module.node_keys = node_keys or nil;
 _mapt_module.way_keys = way_keys or nil;
+_mapt_module.attribute_function = attribute_function or function(attr, layer) return {} end;
 _mapt_module.init_function = init_function or function(name) end;
 _mapt_module.exit_function = exit_function or function() end;
 _mapt_module.node_function = node_function or function() end;
 _mapt_module.way_function = way_function or function() end;
-_mapt_module.relation_scan_function = relation_scan_function or function() end;
+_mapt_module.relation_scan_function = relation_scan_function or function() return false end;
 _mapt_module.relation_function = relation_function or function() end;
 return _mapt_module;
 `, 'utf-8');
@@ -189,18 +190,25 @@ ${generateInvokes('exit_function();')}
 end
 
 function attribute_function(attr, layer)
-  -- TODO: forward to modules
+  -- TODO: only forward to module if the layer was declared in its source file
+  local rv;
+${modnames.map(x => {
+  return `
+  rv = ${x}.attribute_function(attr, layer) or {};
+  if next(rv) ~= nil then return rv end
+`;
+}).join('')}
   return {}
 end
 
 function node_function()
   -- TODO: respect node_keys
-  ${generateInvokes('node_function();')}
+${generateInvokes('node_function();')}
 end
 
 function way_function()
   -- TODO: respect way_keys
-  ${generateInvokes('way_function();')}
+${generateInvokes('way_function();')}
 end
 
 function relation_scan_function()
@@ -209,11 +217,11 @@ function relation_scan_function()
 end
 
 function relation_function()
-  ${generateInvokes('relation_function(); RestartRelations();')}
+${generateInvokes('relation_function(); RestartRelations();')}
 end
 `;
 
-  console.log(driverString);
+  //console.log(driverString);
   fs.writeFileSync(driverFile, driverString, 'utf-8');
 
   const tileFile = resolve(`tiles.pmtiles`);
