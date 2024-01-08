@@ -133,10 +133,7 @@ async function buildSingle(args: {
   // Rewrite the layer-specific Lua files to export their functions.
   // Note that there may be some Lua files that are just library code--
   // we shouldn't rewrite them.
-  let count = 0;
   for (const inputLua of sliceLuas) {
-    count++;
-
     const tmpLua = tmpPrefix + basename(inputLua);
     const dataString = await (Bun.file(inputLua).text());
     fs.writeFileSync(tmpLua, `${dataString}
@@ -155,8 +152,6 @@ return _mapt_module;
     sliceMap[inputLua] = {
       name: basename(tmpLua, '.lua'),
     };
-
-    //if (count >= 8) break;
   }
 
   // Write a driver Lua file that proxies to the layer-specific functions.
@@ -169,7 +164,19 @@ return _mapt_module;
   }
 
   const driverString = `
-${modnames.map(x => `${x} = require('${x}');\n`).join('')}
+local origG = _G;
+
+${modnames.map(x => {
+  const funcName = `func_${x}`;
+  const envName = `env_${x}`;
+  return `
+local ${funcName} = loadfile('${x}.lua');
+local ${envName} = {};
+setmetatable(${envName}, {__index = origG});
+setfenv(${funcName}, ${envName});
+${x} = ${funcName}();
+`;
+}).join('')}
 
 -- TODO: initialize node_keys / way_keys
 
