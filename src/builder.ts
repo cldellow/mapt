@@ -30,6 +30,7 @@ export async function build(args: {
       const slice = file.replace(/.*[/]/, '').replace('.json', '');
       slices.push(slice);
     }
+    slices.sort();
   }
 
   const tmpPrefix = resolve(join('slices', `mapt_${process.pid}_`));
