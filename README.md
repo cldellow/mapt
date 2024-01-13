@@ -3,7 +3,7 @@
 `mapt` is an opinionated tool for building custom [vector tiles](https://docs.mapbox.com/data/tilesets/guides/vector-tiles-introduction/) with [tilemaker](https://github.com/systemed/tilemaker). It can also help author
 [MapLibre style sheets](https://maplibre.org/maplibre-style-spec/).
 
-`mapt` provides an easier developer workflow:
+`mapt` aims for a more pleasant developer workflow:
 
 - encourages thematic slices (e.g. `land`, `roads`, `boundaries`)
   - ⚡ iterate faster when developing

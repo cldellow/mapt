@@ -278,6 +278,11 @@ async function buildMany(args: {
     }
 
     // TODO: convert the JSON file from json6 to vanilla JSON
+    const jsonInputFile = resolve('slices', `${slice}.json`);
+    const dataString = await (Bun.file(jsonInputFile).text());
+    const data = json6.parse(dataString);
+    const tmpJsonInputFile = tmpPrefix + '_input.json';
+    fs.writeFileSync(tmpJsonInputFile, JSON.stringify(data, null, 2), 'utf-8');
 
     const rv = Bun.spawnSync([
       'tilemaker',
@@ -285,7 +290,7 @@ async function buildMany(args: {
       '--output',
       tileFile,
       `--config`,
-      `${slice}.json`,
+      tmpJsonInputFile,
       `--process`,
       `${slice}.lua`,
       ...tilemakerArgs
