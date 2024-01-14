@@ -56,6 +56,8 @@ export async function mergeStyles(isSingle: boolean | string) {
   const dataString = await (Bun.file('styles/style.json').text());
   const rv = json6.parse(dataString);
 
+  const newSourceKeysByUrl = {};
+
   let sourceIndex = 1;
   for (const file of glob.scanSync(".")) {
     const root = file.replace(/.*[/]/, '').replace('.json', '');
@@ -75,14 +77,16 @@ export async function mergeStyles(isSingle: boolean | string) {
       data.sources.tiles.url = `pmtiles://http://localhost:8081/${isSingle ? 'tiles' : root}.pmtiles`;
 
     const sourceMap = {};
-    // TODO: de-dupe, if multiple things use the same URL
     for (const [sourceKey, sourceValue] of Object.entries(data.sources)) {
-      const newSourceKey = `tiles${sourceIndex}`;
-      sourceMap[sourceKey] = newSourceKey;
-
-      rv.sources[newSourceKey] = sourceValue;
-
-      sourceIndex++;
+      if (newSourceKeysByUrl[sourceValue.url]) {
+        sourceMap[sourceKey] = newSourceKeysByUrl[sourceValue.url];
+      } else {
+        const newSourceKey = `tiles${sourceIndex}`;
+        sourceMap[sourceKey] = newSourceKey;
+        rv.sources[newSourceKey] = sourceValue;
+        sourceIndex++;
+        newSourceKeysByUrl[sourceValue.url] = newSourceKey;
+      }
     }
 
     let i = 1;
