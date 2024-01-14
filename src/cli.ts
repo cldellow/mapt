@@ -36,7 +36,8 @@ async function entrypoint() {
       port
     });
   } else if (args[0] === 'style') {
-    const rv = await mergeStyles();
+    let isSingle = args[1] || false;
+    const rv = await mergeStyles(isSingle);
     console.log(JSON.stringify(rv, null, 2));
 
   } else {
@@ -44,7 +45,7 @@ async function entrypoint() {
 
 mapt build [pbf] [layer1] [layer2]  - build tiles
 mapt serve                          - launch tileserver and style server
-mapt style                          - stitch styles/* into a single file
+mapt style [https://path-to-tiles]  - stitch styles/* into a single file
 `);
     process.exit(1);
   }
