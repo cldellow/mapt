@@ -18,8 +18,10 @@ async function entrypoint() {
       tilemakerArgs = args.slice(hasTilemakerArgs + 1);
       args = args.slice(0, hasTilemakerArgs);
     }
+
+    const noOutput = args.indexOf('--no-output') >= 0;
     const isSingle = args.indexOf('--single') >= 0;
-    args = args.filter(x => x !== '--single');
+    args = args.filter(x => x !== '--single' && x !== '--no-output');
     const pbfs = args.filter(x => x.endsWith('.pbf'));
     const slices = args.filter(x => !x.endsWith('.pbf'));
 
@@ -27,6 +29,7 @@ async function entrypoint() {
       pbfs,
       slices,
       isSingle,
+      noOutput,
       tilemakerArgs
     });
   } else if (args[0] === 'serve') {

@@ -14,11 +14,12 @@ class TerminateError extends Error {
 
 export async function build(args: {
   isSingle: boolean,
+  noOutput: boolean,
   pbfs: string[],
   slices: string[],
   tilemakerArgs: string[]
 }) {
-  const { tilemakerArgs, isSingle, pbfs, slices } = args;
+  const { noOutput, tilemakerArgs, isSingle, pbfs, slices } = args;
   if (pbfs.length === 0)
     throw new Error(`you must pass at least one pbf`);
 
@@ -44,9 +45,9 @@ export async function build(args: {
   try {
     try {
       if (isSingle)
-        return await buildSingle({ tmpPrefix, tilemakerArgs, pbfs, slices });
+        return await buildSingle({ noOutput, tmpPrefix, tilemakerArgs, pbfs, slices });
 
-      return await buildMany({ tmpPrefix, tilemakerArgs, pbfs, slices });
+      return await buildMany({ noOutput, tmpPrefix, tilemakerArgs, pbfs, slices });
     } finally {
       if (process.env.KEEP_FILES !== '1') {
         const glob = new Glob(basename(`${tmpPrefix}`) + '*');
@@ -100,6 +101,7 @@ function mergeJson(acc: any, cur: any): any {
 };
 
 async function buildSingle(args: {
+  noOutput: boolean;
   tmpPrefix: string;
   pbfs: string[];
   slices: string[],
@@ -118,9 +120,9 @@ async function buildSingle(args: {
   //
   // It's a bit of bookkeeping, but hopefully gives a good developer
   // experience.
-  const { tmpPrefix, tilemakerArgs, pbfs, slices } = args;
+  const { noOutput, tmpPrefix, tilemakerArgs, pbfs, slices } = args;
 
-  const layerJson = {};
+  let layerJson = {};
 
   // Construct a single JSON file.
   const glob = new Glob("/slices/*.json");
@@ -131,6 +133,9 @@ async function buildSingle(args: {
     const data = json6.parse(dataString);
     mergeJson(layerJson, data);
   }
+
+  if (noOutput)
+    layerJson = rewriteConfigAsNoOutput(layerJson);
 
   const jsonFile = `${tmpPrefix}config.json`;
   fs.writeFileSync(jsonFile, JSON.stringify(layerJson, null, 2), 'utf-8');
@@ -237,7 +242,7 @@ end
   //console.log(driverString);
   fs.writeFileSync(driverFile, driverString, 'utf-8');
 
-  const tileFile = resolve(`tiles.pmtiles`);
+  const tileFile = resolve(`${noOutput ? 'mapt_no_output' : 'tiles'}.pmtiles`);
 
   try {
     fs.unlinkSync(tileFile);
@@ -268,15 +273,22 @@ end
 
 }
 
+function rewriteConfigAsNoOutput(input: any) {
+  const copy = JSON.parse(JSON.stringify(input));
+  copy.settings.minzoom = copy.settings.maxzoom = 0;
+  return copy;
+}
+
 async function buildMany(args: {
+  noOutput: boolean;
   tmpPrefix: string;
   pbfs: string[];
   slices: string[],
   tilemakerArgs: string[]
 }) {
-  const { tmpPrefix, tilemakerArgs, pbfs, slices } = args;
+  const { noOutput, tmpPrefix, tilemakerArgs, pbfs, slices } = args;
   for (const slice of slices) {
-    const tileFile = resolve(`${slice}.pmtiles`);
+    const tileFile = resolve(`${noOutput ? 'mapt_no_output' : slice}.pmtiles`);
 
     try {
       fs.unlinkSync(tileFile);
@@ -286,7 +298,9 @@ async function buildMany(args: {
 
     const jsonInputFile = resolve('slices', `${slice}.json`);
     const dataString = await (Bun.file(jsonInputFile).text());
-    const data = json6.parse(dataString);
+    let data = json6.parse(dataString);
+    if (noOutput)
+      data = rewriteConfigAsNoOutput(data);
     const tmpJsonInputFile = tmpPrefix + '_input.json';
     fs.writeFileSync(tmpJsonInputFile, JSON.stringify(data, null, 2), 'utf-8');
 
@@ -307,6 +321,13 @@ async function buildMany(args: {
       stdout: 'inherit',
       stderr: 'inherit',
     });
+
+    if (noOutput)
+      try {
+        fs.unlinkSync(tileFile);
+      } catch (e) {
+        // ignored
+      }
 
     if (rv.exitCode !== 0)
       throw new TerminateError(rv.exitCode);
