@@ -28,6 +28,12 @@ export async function build(args: {
     const glob = new Glob("/slices/*.json");
     for (const file of glob.scanSync(".")) {
       const slice = file.replace(/.*[/]/, '').replace('.json', '');
+
+      if (slice.startsWith('mapt_')) {
+        fs.unlinkSync(file);
+        continue;
+      }
+
       slices.push(slice);
     }
     slices.sort();
