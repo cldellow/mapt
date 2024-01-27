@@ -252,7 +252,7 @@ end
 
   const rv = Bun.spawnSync([
     ...(process.env.DEBUG === '1' ? ['gdb', '--args'] : []),
-    'tilemaker',
+    process.env.TILEMAKER || 'tilemaker',
     ...pbfs.flatMap(pbf => ['--input', pbf]),
     '--output',
     tileFile,
@@ -306,7 +306,7 @@ async function buildMany(args: {
 
     const rv = Bun.spawnSync([
       ...(process.env.DEBUG === '1' ? ['gdb', '--args'] : []),
-      'tilemaker',
+      process.env.TILEMAKER || 'tilemaker',
       ...pbfs.flatMap(pbf => ['--input', pbf]),
       '--output',
       tileFile,
