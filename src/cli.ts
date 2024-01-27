@@ -22,7 +22,7 @@ async function entrypoint() {
     const noOutput = args.indexOf('--no-output') >= 0;
     const isSingle = args.indexOf('--single') >= 0;
     args = args.filter(x => x !== '--single' && x !== '--no-output');
-    const pbfs = args.filter(x => x.endsWith('.pbf'));
+    const pbfs = args.filter(x => x.endsWith('.pbf')).map(x => path.resolve(x));
     const slices = args.filter(x => !x.endsWith('.pbf'));
 
     return build({
