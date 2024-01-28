@@ -15,11 +15,12 @@ class TerminateError extends Error {
 export async function build(args: {
   isSingle: boolean,
   noOutput: boolean,
+  format: 'mbtiles' | 'pmtiles',
   pbfs: string[],
   slices: string[],
   tilemakerArgs: string[]
 }) {
-  const { noOutput, tilemakerArgs, isSingle, pbfs, slices } = args;
+  const { format, noOutput, tilemakerArgs, isSingle, pbfs, slices } = args;
   if (pbfs.length === 0)
     throw new Error(`you must pass at least one pbf`);
 
@@ -45,9 +46,9 @@ export async function build(args: {
   try {
     try {
       if (isSingle)
-        return await buildSingle({ noOutput, tmpPrefix, tilemakerArgs, pbfs, slices });
+        return await buildSingle({ format, noOutput, tmpPrefix, tilemakerArgs, pbfs, slices });
 
-      return await buildMany({ noOutput, tmpPrefix, tilemakerArgs, pbfs, slices });
+      return await buildMany({ format, noOutput, tmpPrefix, tilemakerArgs, pbfs, slices });
     } finally {
       if (process.env.KEEP_FILES !== '1') {
         const glob = new Glob(basename(`${tmpPrefix}`) + '*');
@@ -101,6 +102,7 @@ function mergeJson(acc: any, cur: any): any {
 };
 
 async function buildSingle(args: {
+  format: 'mbtiles' | 'pmtiles';
   noOutput: boolean;
   tmpPrefix: string;
   pbfs: string[];
@@ -120,7 +122,7 @@ async function buildSingle(args: {
   //
   // It's a bit of bookkeeping, but hopefully gives a good developer
   // experience.
-  const { noOutput, tmpPrefix, tilemakerArgs, pbfs, slices } = args;
+  const { format, noOutput, tmpPrefix, tilemakerArgs, pbfs, slices } = args;
 
   let layerJson = {};
 
@@ -242,7 +244,7 @@ end
   //console.log(driverString);
   fs.writeFileSync(driverFile, driverString, 'utf-8');
 
-  const tileFile = resolve(`${noOutput ? 'mapt_no_output' : 'tiles'}.pmtiles`);
+  const tileFile = resolve(`${noOutput ? 'mapt_no_output' : 'tiles'}.${format}`);
 
   try {
     fs.unlinkSync(tileFile);
@@ -280,15 +282,16 @@ function rewriteConfigAsNoOutput(input: any) {
 }
 
 async function buildMany(args: {
+  format: 'mbtiles' | 'pmtiles';
   noOutput: boolean;
   tmpPrefix: string;
   pbfs: string[];
   slices: string[],
   tilemakerArgs: string[]
 }) {
-  const { noOutput, tmpPrefix, tilemakerArgs, pbfs, slices } = args;
+  const { format, noOutput, tmpPrefix, tilemakerArgs, pbfs, slices } = args;
   for (const slice of slices) {
-    const tileFile = resolve(`${noOutput ? 'mapt_no_output' : slice}.pmtiles`);
+    const tileFile = resolve(`${noOutput ? 'mapt_no_output' : slice}.${format}`);
 
     try {
       fs.unlinkSync(tileFile);

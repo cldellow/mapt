@@ -21,11 +21,13 @@ async function entrypoint() {
 
     const noOutput = args.indexOf('--no-output') >= 0;
     const isSingle = args.indexOf('--single') >= 0;
-    args = args.filter(x => x !== '--single' && x !== '--no-output');
+    const format = args.indexOf('--mbtiles') >= 0 ? 'mbtiles' : 'pmtiles';
+    args = args.filter(x => x !== '--single' && x !== '--no-output' && x !== '--mbtiles');
     const pbfs = args.filter(x => x.endsWith('.pbf')).map(x => path.resolve(x));
     const slices = args.filter(x => !x.endsWith('.pbf'));
 
     return build({
+      format,
       pbfs,
       slices,
       isSingle,

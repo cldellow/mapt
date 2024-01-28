@@ -53,16 +53,20 @@ Build `land.pmtiles` and `water.pmtiles` with `file.pbf` as input.
 
 Your tilemaker configuration will be read from `slices/land.json`, your Lua profile from `layers/land.lua`, etc.
 
-### `--single`
+### `--mbtiles`
 
-`--single` specifies that your slices should be composited into a single Lua file. In this mode,
-a single `tiles.pmtiles` file is generated.
+`--mbtiles` specifies that you want MBTiles output rather than the default PMTiles.
 
 ### `--no-output`
 
 `--no-output` abuses tilemaker zoom settings to avoid writing out tiles. This is useful if you
 just want the side effect of running your Lua code, for example, perhaps your Lua code creates a SQLite
 autosuggest index.
+
+### `--single`
+
+`--single` specifies that your slices should be composited into a single Lua file. In this mode,
+a single `tiles.pmtiles` file is generated.
 
 `--no-output` and `--single` may be used together.
 
