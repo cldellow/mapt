@@ -25,7 +25,10 @@ async function getLayerInformation() {
 
 
   const glob = new Glob("/slices/*.json");
-  for (const file of glob.scanSync(".")) {
+  for (const file of glob.scanSync({
+    root: ".",
+    onlyFiles: false, // we want to allow symlinks
+  })) {
     const root = file.replace(/.*[/]/, '').replace('.json', '');
     const dataString = await (Bun.file(file).text());
     const data = json6.parse(dataString);
@@ -59,7 +62,10 @@ export async function mergeStyles(isSingle: boolean | string) {
   const newSourceKeysByUrl = {};
 
   let sourceIndex = 1;
-  for (const file of glob.scanSync(".")) {
+  for (const file of glob.scanSync({
+    root: ".",
+    onlyFiles: false, // we want to allow symlinks
+  })) {
     const root = file.replace(/.*[/]/, '').replace('.json', '');
 
     if (root === 'style')
