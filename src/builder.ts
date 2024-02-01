@@ -28,7 +28,10 @@ export async function build(args: {
     while(slices.length > 0) slices.pop();
 
     const glob = new Glob("/slices/*.json");
-    for (const file of glob.scanSync(".")) {
+    for (const file of glob.scanSync({
+      root: ".",
+      onlyFiles: false, // we want to allow symlinks
+    })) {
       const slice = file.replace(/.*[/]/, '').replace('.json', '');
 
       if (slice.startsWith('mapt_')) {
