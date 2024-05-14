@@ -27,7 +27,7 @@ export async function build(args: {
   if (slices.length === 0 || isSingle) {
     while(slices.length > 0) slices.pop();
 
-    const glob = new Glob("/slices/*.json");
+    const glob = new Glob(resolve("slices", "*.json"));
     for (const file of glob.scanSync({
       root: ".",
       onlyFiles: false, // we want to allow symlinks
@@ -64,7 +64,7 @@ export async function build(args: {
   } catch (e) {
     if (e instanceof TerminateError)
       process.exit(e.exitCode);
-    
+
     throw e;
   }
 }
