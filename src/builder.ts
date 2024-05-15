@@ -130,7 +130,7 @@ async function buildSingle(args: {
   let layerJson = {};
 
   // Construct a single JSON file.
-  const glob = new Glob("/slices/*.json");
+  const glob = new Glob(resolve("slices", "*.json"));
   const sliceLuas = [];
   for (const file of glob.scanSync(".")) {
     sliceLuas.push(resolve('slices', basename(file, '.json') + '.lua'));
@@ -186,13 +186,13 @@ local origG = _G;
 
 ${modnames.map(x => {
   const funcName = `func_${x}`;
-  const envName = `env_${x}`;
   return `
-local ${funcName} = loadfile('${x}.lua');
-local ${envName} = {};
-setmetatable(${envName}, {__index = origG});
-setfenv(${funcName}, ${envName});
-${x} = ${funcName}();
+local ${funcName}, message = loadfile('${x}.lua');
+if not ${funcName} then
+  error(message)
+end
+local ${x} = ${funcName}();
+setmetatable(${x}, {__index = origG});
 `;
 }).join('')}
 
@@ -244,7 +244,7 @@ ${generateInvokes('relation_function(); RestartRelations();')}
 end
 `;
 
-  //console.log(driverString);
+  // console.log(driverString);
   fs.writeFileSync(driverFile, driverString, 'utf-8');
 
   const tileFile = resolve(`${noOutput ? 'mapt_no_output' : 'tiles'}.${format}`);
