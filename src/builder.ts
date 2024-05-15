@@ -187,9 +187,9 @@ local origG = _G;
 ${modnames.map(x => {
   const funcName = `func_${x}`;
   return `
-local ${funcName}, message = loadfile('${x}.lua');
+local ${funcName}, err = loadfile('${x}.lua');
 if not ${funcName} then
-  error(message)
+  error(err)
 end
 local ${x} = ${funcName}();
 setmetatable(${x}, {__index = origG});
