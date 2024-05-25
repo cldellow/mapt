@@ -3,7 +3,7 @@
 // It's not clear if that license extends to their colour palette, but to be conservative,
 // I assume it does.
 
-export const colors = {
+export const colors: { [name: string]: string } = {
   "red-900": "#7f1d1d",
   "red-800": "#991b1b",
   "red-700": "#b91c1c",
