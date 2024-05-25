@@ -112,8 +112,9 @@ export function serve(args: {
       const response = new Response(file);
 
       // Enable CORS.
-      if (req.headers.get('origin')) {
-        response.headers.set('Access-Control-Allow-Origin', req.headers.get('origin'));
+      const origin = req.headers.get('origin');
+      if (origin) {
+        response.headers.set('Access-Control-Allow-Origin', origin);
       }
 
       return response;
