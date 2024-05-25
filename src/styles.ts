@@ -1,4 +1,5 @@
 import { Glob } from "bun";
+import { resolve } from 'path';
 import json6 from 'json-6';
 import { rewriteColors } from './colors';
 
@@ -24,7 +25,7 @@ async function getLayerInformation() {
   }
 
 
-  const glob = new Glob("/slices/*.json");
+  const glob = new Glob(resolve("slices", "*.json"));
   for (const file of glob.scanSync({
     root: ".",
     onlyFiles: false, // we want to allow symlinks
@@ -141,5 +142,3 @@ export async function mergeStyles(
   rewriteColors(rv);
   return rv;
 }
-
-
