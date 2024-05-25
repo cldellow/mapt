@@ -1,9 +1,10 @@
 import { Glob } from "bun";
 import { normalize, join, resolve } from 'path';
+import type { InteractiveServiceStyles } from './styles';
 import { mergeStyles } from './styles';
 
-async function handleStyleJson(isSingle: boolean) {
-  const data = await mergeStyles(isSingle);
+async function handleStyleJson(config: InteractiveServiceStyles) {
+  const data = await mergeStyles(config);
   return new Response(
     JSON.stringify(data),
     {
@@ -79,7 +80,7 @@ export function serve(args: {
     development: true,
     async fetch(req) {
       const url = new URL(req.url);
-      const single = url.searchParams.has('single');
+      const isSingle = url.searchParams.has('single');
       console.log(`${new Date().toISOString()}: ${url.pathname}`);
 
       if (url.pathname === '/')
@@ -89,7 +90,10 @@ export function serve(args: {
 
       // Try to load .json documents with json-6 parser so that we can have comments, etc
       if (path.endsWith('style.json'))
-        return handleStyleJson(single);
+        return handleStyleJson({
+          isSingle,
+          rootUrl: url.origin
+        });
 
       let file = Bun.file(path);
 

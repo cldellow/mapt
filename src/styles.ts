@@ -50,7 +50,22 @@ async function getLayerInformation() {
   }
 }
 
-export async function mergeStyles(isSingle: boolean | string) {
+// When used as a server, pass the prefix to be used, e.g.
+// http://localhost:8081
+export interface InteractiveServiceStyles {
+  rootUrl: string;
+  isSingle: boolean;
+}
+
+// When used as a pre-built style file, pass in the full path
+// to your PMTiles file, e.g. and S3 or R2 URL.
+export interface PrebuiltStyles {
+  pmtilesUrl: string;
+}
+
+export async function mergeStyles(
+  config: InteractiveServiceStyles | PrebuiltStyles
+) {
   const { layerIndex, layersInFile } = await getLayerInformation();
 
   // We maintain our styles in the /styles/ folder.
@@ -77,10 +92,10 @@ export async function mergeStyles(isSingle: boolean | string) {
 
     // TODO: we should support inserting the whole sources/tiles key if absent,
     //       to simplify things
-    if (typeof isSingle === 'string')
-      data.sources.tiles.url = `pmtiles://${isSingle}`;
+    if ('pmtilesUrl' in config)
+      data.sources.tiles.url = `pmtiles://${config.pmtilesUrl}`;
     else
-      data.sources.tiles.url = `pmtiles://http://localhost:8081/${isSingle ? 'tiles' : root}.pmtiles`;
+      data.sources.tiles.url = `pmtiles://${config.rootUrl}/${config.isSingle ? 'tiles' : root}.pmtiles`;
 
     const sourceMap = {};
     for (const [sourceKey, sourceValue] of Object.entries(data.sources)) {

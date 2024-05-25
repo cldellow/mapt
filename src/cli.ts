@@ -41,8 +41,14 @@ async function entrypoint() {
       port
     });
   } else if (args[0] === 'style') {
-    let isSingle = args[1] || false;
-    const rv = await mergeStyles(isSingle);
+    let pmtilesUrl = args[1];
+    const rv = await mergeStyles(pmtilesUrl ? {
+      pmtilesUrl
+    } : {
+      isSingle: false,
+      rootUrl: 'http://localhost:8081'
+
+    });
     console.log(JSON.stringify(rv, null, 2));
 
   } else {
