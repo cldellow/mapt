@@ -145,7 +145,7 @@ async function buildSingle(args: {
   const jsonFile = `${tmpPrefix}config.json`;
   fs.writeFileSync(jsonFile, JSON.stringify(layerJson, null, 2), 'utf-8');
 
-  const sliceMap = {};
+  const sliceMap: { [filename: string]: { name: string; } } = {};
 
   // Rewrite the layer-specific Lua files to export their functions.
   // Note that there may be some Lua files that are just library code--
