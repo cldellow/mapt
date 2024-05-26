@@ -99,11 +99,11 @@ export function serve(args: {
 
       // Support Range requests for PMTiles, adapted from
       // https://bun.sh/docs/api/http#streaming-files
-      if (req.headers.get('Range')) {
-        const [start = 0, end = Infinity] = req.headers
-          .get("Range") // Range: bytes=0-100
+      const range = req.headers.get('Range');
+      if (range) {
+        const [start = 0, end = Infinity] = range // Range: bytes=0-100
           .split("=") // ["Range: bytes", "0-100"]
-          .at(-1) // "0-100"
+          .at(-1)! // "0-100"
           .split("-") // ["0", "100"]
           .map(Number); // [0, 100]
         file = file.slice(start, end + 1);
