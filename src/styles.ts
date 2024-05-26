@@ -6,7 +6,7 @@ import { rewriteColors } from './colors';
 async function getLayerInformation() {
   // Background and hillshading aren't defined via tilemaker outputs, so set their
   // z-indexes here.
-  const layerIndex = {};
+  const layerIndex: { [layerId: string]: number } = {};
   const layersInFile = {};
 
   {
@@ -126,9 +126,9 @@ export async function mergeStyles(
     }
   }
 
-  rv.layers.sort((a, b) => {
-    const aLayer = a['source-layer'] || a['id'] || '';
-    const bLayer = b['source-layer'] || b['id'] || '';
+  rv.layers.sort((a: any, b: any) => {
+    const aLayer: string = a['source-layer'] || a['id'] || '';
+    const bLayer: string = b['source-layer'] || b['id'] || '';
 
     const az = layerIndex[aLayer] ?? 99999;
     const bz = layerIndex[bLayer] ?? 99999;
