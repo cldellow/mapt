@@ -15,7 +15,7 @@ async function handleStyleJson(config: InteractiveServiceStyles) {
   );
 }
 
-export function normalizePath(rootDir, rawPathname) {
+export function normalizePath(rootDir: string, rawPathname: string) {
   let path = `${rawPathname}`;
   if (path === '/map')
     path = '/map.html';
