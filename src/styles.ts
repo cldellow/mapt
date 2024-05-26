@@ -7,7 +7,7 @@ async function getLayerInformation() {
   // Background and hillshading aren't defined via tilemaker outputs, so set their
   // z-indexes here.
   const layerIndex: { [layerId: string]: number } = {};
-  const layersInFile = {};
+  const layersInFile: { [filename: string]: { [layerName: string]: true } } = {};
 
   {
     const dataString = await (Bun.file('styles/style.json').text());
@@ -34,7 +34,7 @@ async function getLayerInformation() {
     const dataString = await (Bun.file(file).text());
     const data = json6.parse(dataString);
 
-    const seenLayers = {};
+    const seenLayers: { [k: string]: true } = {};
 
     for (const [k, v] of Object.entries(data.layers || {})) {
       seenLayers[k] = true;
