@@ -75,7 +75,7 @@ function mergeJson(acc: any, cur: any): any {
     if (typeof acc[k] === 'undefined') {
       acc[k] = v;
     } else if (k === 'layers') {
-      for (const [layerName, layer] of Object.entries(v)) {
+      for (const [layerName, layer] of Object.entries(v as any)) {
         if (acc.layers[layerName]) {
           // This isn't _always_ an error. For example, Hiker Atlas
           // uses a fake `parks` layer.
@@ -85,13 +85,13 @@ function mergeJson(acc: any, cur: any): any {
         acc.layers[layerName] = layer;
       }
     } else if (k === 'settings') {
-      for (const [setting, value] of Object.entries(v)) {
+      for (const [setting, value] of Object.entries(v as any)) {
         if (setting === 'minzoom')
           // Take min
-          acc.settings[setting] = Math.min(value, acc.settings[setting] ?? 999);
+          acc.settings[setting] = Math.min(value as unknown as number, acc.settings[setting] ?? 999);
         else if (setting === 'maxzoom' || setting === 'basezoom')
           // Take max
-          acc.settings[setting] = Math.max(value, acc.settings[setting] ?? -1);
+          acc.settings[setting] = Math.max(value as unknown as number, acc.settings[setting] ?? -1);
         else if (setting === 'include_ids' || setting === 'compress' || setting == 'metadata' || setting == 'filemetadata' || setting === 'combine_below' || setting === 'name' || setting === 'version' || setting === 'description')
           // Last writer wins
           acc.settings[setting] = value;
