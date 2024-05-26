@@ -37,7 +37,7 @@ export function normalizePath(rootDir: string, rawPathname: string) {
 export async function handleIndex() {
   const tiles = [];
 
-  const glob = new Glob("/*.pmtiles");
+  const glob = new Glob("*.pmtiles");
   const files = [];
   for (const file of glob.scanSync("."))
     files.push(file);

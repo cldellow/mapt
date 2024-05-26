@@ -27,7 +27,6 @@ async function getLayerInformation() {
 
   const glob = new Glob(resolve("slices", "*.json"));
   for (const file of glob.scanSync({
-    root: ".",
     onlyFiles: false, // we want to allow symlinks
   })) {
     const root = file.replace(/.*[/]/, '').replace('.json', '');
@@ -71,7 +70,7 @@ export async function mergeStyles(
   const { layerIndex, layersInFile } = await getLayerInformation();
 
   // We maintain our styles in the /styles/ folder.
-  const glob = new Glob("/styles/*.json");
+  const glob = new Glob(resolve('styles', '*.json'));
 
   const dataString = await (Bun.file('styles/style.json').text());
   const rv = json6.parse(dataString);
@@ -80,7 +79,6 @@ export async function mergeStyles(
 
   let sourceIndex = 1;
   for (const file of glob.scanSync({
-    root: ".",
     onlyFiles: false, // we want to allow symlinks
   })) {
     const root = file.replace(/.*[/]/, '').replace('.json', '');
