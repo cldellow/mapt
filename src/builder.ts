@@ -5,7 +5,9 @@ import os from 'os';
 import json6 from 'json-6';
 
 class TerminateError extends Error {
-  constructor(exitCode) {
+  exitCode: number;
+
+  constructor(exitCode: number) {
     super("");
     this.name = "TerminateError";
     this.exitCode = exitCode;
@@ -29,7 +31,6 @@ export async function build(args: {
 
     const glob = new Glob(resolve("slices", "*.json"));
     for (const file of glob.scanSync({
-      root: ".",
       onlyFiles: false, // we want to allow symlinks
     })) {
       const slice = file.replace(/.*[/]/, '').replace('.json', '');
