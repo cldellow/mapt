@@ -38,8 +38,9 @@ async function getLayerInformation() {
 
     for (const [k, v] of Object.entries(data.layers || {})) {
       seenLayers[k] = true;
-      if (typeof v.zindex === 'number')
-        layerIndex[k] = v.zindex;
+      const zindex = (v as any)?.zindex;
+      if (typeof zindex === 'number')
+        layerIndex[k] = zindex;
     }
 
     layersInFile[root] = seenLayers;
