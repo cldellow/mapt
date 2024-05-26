@@ -228,7 +228,7 @@ export const colors: { [name: string]: string } = {
 
 // Rewrite a style.json file, replacing any references to colours with their
 // hex codes.
-export function rewriteColors(x) {
+export function rewriteColors(x: any) {
   if (Array.isArray(x)) {
     for (let i = 0; i < x.length; i++) {
       if (typeof x[i] === 'string') {
