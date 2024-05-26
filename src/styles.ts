@@ -75,7 +75,7 @@ export async function mergeStyles(
   const dataString = await (Bun.file('styles/style.json').text());
   const rv = json6.parse(dataString);
 
-  const newSourceKeysByUrl = {};
+  const newSourceKeysByUrl: { [name: string]: string } = {};
 
   let sourceIndex = 1;
   for (const file of glob.scanSync({
