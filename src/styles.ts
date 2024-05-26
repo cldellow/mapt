@@ -100,14 +100,15 @@ export async function mergeStyles(
 
     const sourceMap: { [id: string]: string } = {};
     for (const [sourceKey, sourceValue] of Object.entries(data.sources)) {
-      if (newSourceKeysByUrl[sourceValue.url]) {
-        sourceMap[sourceKey] = newSourceKeysByUrl[sourceValue.url];
+      const sourceValueUrl = (sourceValue as any).url;
+      if (newSourceKeysByUrl[sourceValueUrl]) {
+        sourceMap[sourceKey] = newSourceKeysByUrl[sourceValueUrl];
       } else {
         const newSourceKey = `tiles${sourceIndex}`;
         sourceMap[sourceKey] = newSourceKey;
         rv.sources[newSourceKey] = sourceValue;
         sourceIndex++;
-        newSourceKeysByUrl[sourceValue.url] = newSourceKey;
+        newSourceKeysByUrl[sourceValueUrl] = newSourceKey;
       }
     }
 
