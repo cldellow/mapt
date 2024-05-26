@@ -98,7 +98,7 @@ export async function mergeStyles(
     else
       data.sources.tiles.url = `pmtiles://${config.rootUrl}/${config.isSingle ? 'tiles' : root}.pmtiles`;
 
-    const sourceMap = {};
+    const sourceMap: { [id: string]: string } = {};
     for (const [sourceKey, sourceValue] of Object.entries(data.sources)) {
       if (newSourceKeysByUrl[sourceValue.url]) {
         sourceMap[sourceKey] = newSourceKeysByUrl[sourceValue.url];
