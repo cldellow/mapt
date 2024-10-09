@@ -2,6 +2,8 @@ import { Glob } from "bun";
 import { normalize, join, resolve } from 'path';
 import type { InteractiveServiceStyles } from './styles';
 import { mergeStyles } from './styles';
+import { FetchSource, FileSource, PMTiles } from 'pmtiles';
+import fs from 'fs';
 
 async function handleStyleJson(config: InteractiveServiceStyles) {
   const data = await mergeStyles(config);
@@ -48,7 +50,7 @@ export async function handleIndex() {
     const pmUrl = `https://protomaps.github.io/PMTiles/?url=${encodeURIComponent(url)}`;
     console.log(file);
     tiles.push(
-      `<li><a href="${pmUrl}">${file}</a></li>`
+      `<li><a href="${pmUrl}">${file}</a> - http://localhost:8081/${file}/0/0/0.mvt</li>`
     );
   }
 
@@ -62,12 +64,55 @@ See your map, with styling: <a href='/map'>development</a> or <a href='/map?sing
 <ul>
 ${tiles.join('')}
 </ul>
+<hr/>
+<a href="https://observablehq.com/@henrythasler/mapbox-vector-tile-dissector">MapBox vector tile dissector</a>
 </body>
 `);
 
   response.headers.set('Content-type', 'text/html');
 
   return response;
+}
+
+const mvtRe = /^([^/]+[.]pmtiles)[/]([0-9]+)[/]([0-9]+)[/]([0-9]+).mvt$/;
+
+function NodeSource(filename: string) {
+  return {
+    getBytes: async (offset: number, length: number): Promise<RangeResponse> => {
+      const fd = await fs.promises.open(filename);
+      try {
+        const buffer = new ArrayBuffer(length);
+        await fd.read(buffer, 0, length, offset);
+        return {
+          data: buffer,
+        };
+      } finally {
+        fd.close();
+      }
+    },
+    getKey: () => filename
+  }
+}
+
+// e.g. http://localhost:8081/land.pmtiles/14/8717/5683.mvt
+async function handleMVT(
+  origin: string,
+  pmtilesFile: string,
+  z: number,
+  x: number,
+  y: number
+) {
+  const pmtiles = new PMTiles(NodeSource(pmtilesFile));
+  const tile = await pmtiles.getZxy(z, x, y);
+  return new Response(
+    tile.data,
+    {
+      headers: {
+        'content-type': 'application/vnd.mapbox-vector-tile',
+        ...(origin ? { 'access-control-allow-origin': origin } : {}),
+      }
+    }
+  );
 }
 
 export function serve(args: {
@@ -87,13 +132,16 @@ export function serve(args: {
         return handleIndex();
 
       const path = normalizePath(rootDir, url.pathname);
-
       // Try to load .json documents with json-6 parser so that we can have comments, etc
       if (path.endsWith('style.json'))
         return handleStyleJson({
           isSingle,
           rootUrl: url.origin
         });
+
+      const m = mvtRe.exec(path);
+      if (m)
+        return handleMVT(req.headers.get('origin'), m[1], Number(m[2]), Number(m[3]), Number(m[4]));
 
       let file = Bun.file(path);
 

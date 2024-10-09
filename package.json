@@ -18,6 +18,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "json-6": "^1.1.4"
+    "json-6": "^1.1.4",
+    "pmtiles": "^3.2.0"
   }
 }
