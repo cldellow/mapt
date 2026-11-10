@@ -99,5 +99,8 @@ The algorithm for stitching styles is:
   - merge its `layers` key, prefixing `id` to avoid conflicts, and updating `source-layer` as needed
 - sort the resulting `layers` entries by `layer-z-index`, then by their original order in the source style file
   - `layer-z-index` is the layer-specific `zindex` value defined in `slices/*.json` files
+  - a style layer can override it with its own `metadata.zindex`, e.g. `"metadata": {"zindex": 98}`,
+    to draw a few of a source layer's style layers above or below the rest. MapLibre places labels
+    from the top layer down, so this also gives those layers' labels priority over the layers below.
 
 This approach constrains the expressiveness of your style files: style rules for a given layer cannot be interwoven with style rules for other layers. This is generally what you want, and failing to follow this rule can result in difficult to debug situations.

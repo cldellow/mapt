@@ -126,12 +126,19 @@ export async function mergeStyles(
     }
   }
 
-  rv.layers.sort((a: any, b: any) => {
-    const aLayer: string = a['source-layer'] || a['id'] || '';
-    const bLayer: string = b['source-layer'] || b['id'] || '';
+  // A layer's z-index is its source layer's, unless it sets its own in
+  // metadata.zindex: e.g. to draw (and place labels for) a few layers of one
+  // source layer above another source layer's.
+  const zindexOf = (layer: any): number => {
+    const own = layer.metadata?.zindex;
+    if (typeof own === 'number')
+      return own;
+    return layerIndex[layer['source-layer'] || layer['id'] || ''] ?? 99999;
+  };
 
-    const az = layerIndex[aLayer] ?? 99999;
-    const bz = layerIndex[bLayer] ?? 99999;
+  rv.layers.sort((a: any, b: any) => {
+    const az = zindexOf(a);
+    const bz = zindexOf(b);
 
     if (az != bz)
       return az - bz;
